@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Goles / Lambda
             const lambdaHome = (hGF + aGA) / 2;
             const lambdaAway = (aGF + hGA) / 2;
+            const totalGoalsExp = lambdaHome + lambdaAway;
 
             document.getElementById('lambdaHomeVal').innerText = lambdaHome.toFixed(2);
             document.getElementById('lambdaAwayVal').innerText = lambdaAway.toFixed(2);
@@ -50,17 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
             }
 
-            // Función auxiliar para calcular cuota justa y etiqueta de valor
             function getOddAndBadge(probDecimal) {
-                let prob = Math.max(0.01, Math.min(0.99, probDecimal)); // Evitar divisiones por cero
+                let prob = Math.max(0.01, Math.min(0.99, probDecimal));
                 let odd = (1 / prob).toFixed(2);
                 let badge = '';
-                
-                // Si la probabilidad supera el 65% (alta confianza / value)
                 if (prob >= 0.65) {
                     badge = ` <span style="background: #10b981; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">🔥 Value</span>`;
                 }
                 return `<strong>${(prob * 100).toFixed(1)}%</strong> <span style="color: #38bdf8; font-size: 0.85rem;">(Cuota: ${odd})</span>${badge}`;
+            }
+
+            function poissonOverProbRaw(lambda, threshold) {
+                let cumulative = 0;
+                for (let k = 0; k <= threshold; k++) {
+                    cumulative += poisson(lambda, k);
+                }
+                return Math.max(0.01, Math.min(0.99, 1 - cumulative));
             }
 
             let homeWin = 0, draw = 0, awayWin = 0, bttsYes = 0, over25 = 0;
@@ -102,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 topScoresList.appendChild(li);
             }
 
-            // Estadísticas adicionales (Remates, Puerta, Corners)
+            // Estadísticas adicionales
             const homeShotsExp = (hRH + aRR) / 2;
             const awayShotsExp = (aRH + hRR) / 2;
             const homeOnTargetExp = (hPH + aPR) / 2;
@@ -114,14 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalOnTargetExp = homeOnTargetExp + awayOnTargetExp;
             const totalCornersExp = homeCornersExp + awayCornersExp;
 
-            function poissonOverProb(lambda, threshold) {
-                let cumulative = 0;
-                for (let k = 0; k <= threshold; k++) {
-                    cumulative += poisson(lambda, k);
-                }
-                return Math.max(0.05, Math.min(0.95, 1 - cumulative));
-            }
-
             const homeShotsThresh = Math.floor(homeShotsExp - 0.5);
             const awayShotsThresh = Math.floor(awayShotsExp - 0.5);
             const homeOnTargetThresh = Math.floor(homeOnTargetExp - 0.5);
@@ -129,22 +127,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const homeCornersThresh = Math.floor(homeCornersExp - 0.5);
             const awayCornersThresh = Math.floor(awayCornersExp - 0.5);
 
-            const pHShots = poissonOverProb(homeShotsExp, homeShotsThresh);
-            const pAShots = poissonOverProb(awayShotsExp, awayShotsThresh);
-            const pHOnTarget = poissonOverProb(homeOnTargetExp, homeOnTargetThresh);
-            const pAOnTarget = poissonOverProb(awayOnTargetExp, awayOnTargetThresh);
-            const pHCorners = poissonOverProb(homeCornersExp, homeCornersThresh);
-            const pACorners = poissonOverProb(awayCornersExp, awayCornersThresh);
+            const pHShots = poissonOverProbRaw(homeShotsExp, homeShotsThresh);
+            const pAShots = poissonOverProbRaw(awayShotsExp, awayShotsThresh);
+            const pHOnTarget = poissonOverProbRaw(homeOnTargetExp, homeOnTargetThresh);
+            const pAOnTarget = poissonOverProbRaw(awayOnTargetExp, awayOnTargetThresh);
+            const pHCorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
+            const pACorners = poissonOverProbRaw(awayCornersExp, awayCornersThresh);
 
             const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
             const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
             const totalCornersThresh = Math.floor(totalCornersExp - 0.5);
+            const totalGoalsThresh = Math.floor(totalGoalsExp - 0.5);
 
-            const pTotalShots = poissonOverProb(totalShotsExp, totalShotsThresh);
-            const pTotalOnTarget = poissonOverProb(totalOnTargetExp, totalOnTargetThresh);
-            const pTotalCorners = poissonOverProb(totalCornersExp, totalCornersThresh);
+            const pTotalShots = poissonOverProbRaw(totalShotsExp, totalShotsThresh);
+            const pTotalOnTarget = poissonOverProbRaw(totalOnTargetExp, totalOnTargetThresh);
+            const pTotalCorners = poissonOverProbRaw(totalCornersExp, totalCornersThresh);
+            const pTotalGoals = poissonOverProbRaw(totalGoalsExp, totalGoalsThresh);
 
-            // Renderizar estadísticas individuales con sus cuotas y badges
             document.getElementById('individualStatsContainer').innerHTML = `
                 <div style="background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #38bdf8;">
                     <h4 style="color: #38bdf8; margin-bottom: 6px;">🏠 Equipo Local</h4>
@@ -164,15 +163,38 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${getOddAndBadge(pTotalOnTarget)})</span>`;
             document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${getOddAndBadge(pTotalCorners)})</span>`;
 
+            // Función para generar una lista de varios márgenes escalonados
+            function generateRangesList(lambda, baseThresh) {
+                let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
+                let start = Math.max(0, baseThresh - 2);
+                for (let t = start; t <= start + 4; t++) {
+                    let prob = poissonOverProbRaw(lambda, t);
+                    let odd = (1 / prob).toFixed(2);
+                    let highlight = (t === baseThresh) ? 'border-left: 3px solid #38bdf8; padding-left: 4px; font-weight: bold;' : '';
+                    html += `<div style="${highlight}">Más de ${t}.5 $\rightarrow$ <strong>${(prob * 100).toFixed(1)}%</strong> (Cuota: ${odd})</div>`;
+                }
+                html += '</div>';
+                return html;
+            }
+
+            // Desglose completo para Goles, Remates Totales, Remates a Puerta y Tiros de Esquina
             document.getElementById('recommendationsList').innerHTML = `
-                <div class="rec-item">🎯 <strong>Remates Local:</strong> Más de ${homeShotsThresh}.5 (${getOddAndBadge(pHShots)})</div>
-                <div class="rec-item">🎯 <strong>Remates Visitante:</strong> Más de ${awayShotsThresh}.5 (${getOddAndBadge(pAShots)})</div>
-                <div class="rec-item">⚡ <strong>A Puerta Local:</strong> Más de ${homeOnTargetThresh}.5 (${getOddAndBadge(pHOnTarget)})</div>
-                <div class="rec-item">⚡ <strong>A Puerta Visitante:</strong> Más de ${awayOnTargetThresh}.5 (${getOddAndBadge(pAOnTarget)})</div>
-                <div class="rec-item">🚩 <strong>Corners Local:</strong> Más de ${homeCornersThresh}.5 (${getOddAndBadge(pHCorners)})</div>
-                <div class="rec-item">🚩 <strong>Corners Visitante:</strong> Más de ${awayCornersThresh}.5 (${getOddAndBadge(pACorners)})</div>
-                <div class="rec-item">📈 <strong>Total Remates Partido:</strong> Más de ${totalShotsThresh}.5 (${getOddAndBadge(pTotalShots)})</div>
-                <div class="rec-item">📈 <strong>Total Corners Partido:</strong> Más de ${totalCornersThresh}.5 (${getOddAndBadge(pTotalCorners)})</div>
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                    ⚽ <strong>Desglose de Márgenes - Goles Totales Partido (${totalGoalsExp.toFixed(2)} esp.):</strong>
+                    ${generateRangesList(totalGoalsExp, totalGoalsThresh)}
+                </div>
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                    📈 <strong>Desglose de Márgenes - Remates Totales Partido (${totalShotsExp.toFixed(1)} esp.):</strong>
+                    ${generateRangesList(totalShotsExp, totalShotsThresh)}
+                </div>
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                    ⚡ <strong>Desglose de Márgenes - Remates a Puerta Totales (${totalOnTargetExp.toFixed(1)} esp.):</strong>
+                    ${generateRangesList(totalOnTargetExp, totalOnTargetThresh)}
+                </div>
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start;">
+                    🚩 <strong>Desglose de Márgenes - Tiros de Esquina Totales (${totalCornersExp.toFixed(1)} esp.):</strong>
+                    ${generateRangesList(totalCornersExp, totalCornersThresh)}
+                </div>
             `;
 
             if (resultsSection) resultsSection.style.display = 'block';
