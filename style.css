@@ -1,7 +1,8 @@
-/* ==========================================
-   ESTILO ORIGINAL PREFERIDO
-   ========================================== */
+/* ============================================================
+   RESTAURACIÓN A ESTILO ORIGINAL (Basado en image_2.png)
+   ============================================================ */
 
+/* Fondo General */
 body {
     background-color: #0b0f19;
     color: #f8fafc;
@@ -11,50 +12,158 @@ body {
     box-sizing: border-box;
 }
 
-.container, main, .card {
-    background-color: #111827;
-    border: 1px solid #1f2937;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    padding: 20px;
+/* Contenedor Principal */
+.container {
+    background-color: #0b0f19; /* Fondo oscuro base */
     max-width: 600px;
-    margin: 0 auto 20px auto;
+    margin: 0 auto;
+    padding-bottom: 20px;
 }
 
-h1, h2, h3, h4 {
+/* Títulos e Iconos */
+h1, h2 {
     color: #f9fafb;
     font-weight: 700;
-    letter-spacing: -0.025em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
 }
 
+/* Secciones de Equipo (Tarjetas contenedoras) */
+.equipo-section {
+    background-color: #111827; /* Fondo de la tarjeta */
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #1f2937; /* Borde sutil */
+}
+
+/* Etiquetas de estadísticas (G. Hecho, G. Recib, etc.) */
+.stat-label {
+    color: #a1aab6;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Campos de entrada de datos (Inputs) */
 input[type="number"] {
-    background-color: #1f2937;
-    border: 1px solid #374151;
+    background-color: #111827; /* Fondo oscuro del input */
+    border: 1px solid #374151; /* Borde gris */
     color: #ffffff;
-    padding: 8px 12px;
+    padding: 8px;
     border-radius: 6px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     width: 100%;
     box-sizing: border-box;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
-button, .btn {
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-    color: #ffffff;
+/* Efecto al enfocar el input */
+input[type="number"]:focus {
+    outline: none;
+    border-color: #38bdf8;
+}
+
+/* Organización de los inputs en filas (usando Grid o Flex) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botones Principales (Calcular y Reiniciar) */
+button {
     border: none;
-    padding: 10px 16px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     width: 100%;
     font-size: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    color: #ffffff;
+    transition: background-color 0.2s;
 }
 
+/* Botón Calcular (Azul) */
+.btn-calcular {
+    background-color: #0ea5e9; /* Azul original */
+}
+
+.btn-calcular:hover {
+    background-color: #0284c7;
+}
+
+/* Botón Reiniciar (Azul más oscuro) */
+.btn-reiniciar {
+    background-color: #0f172a; /* Azul oscuro original */
+    border: 1px solid #334155;
+}
+
+.btn-reiniciar:hover {
+    background-color: #1e293b;
+}
+
+/* Sección de Resultados */
 #resultsSection {
     background-color: #111827;
-    border: 1px solid #1f2937;
     border-radius: 12px;
     padding: 15px;
     margin-top: 20px;
+    border: 1px solid #1f2937;
+}
+
+/* Subtítulos de Resultados */
+#resultsSection h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #f9fafb;
+}
+
+/* Bloques de Probabilidades e individuales */
+.prob-box, .stat-box {
+    background-color: #161e2e; /* Fondo ligeramente diferente para destacar */
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Textos de Cuotas y Porcentajes */
+.cuota {
+    color: #38bdf8; /* Azul claro para las cuotas */
+    font-weight: bold;
+}
+
+.valor-alto {
+    color: #4ade80; /* Verde para el Value */
+    font-weight: bold;
+}
+
+/* Etiquetas Value (La llamita) */
+.tag-value {
+    background-color: #16a34a;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-left: 5px;
+}
+
+/* Marcadores más probables */
+.marcador-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #1f2937;
+    font-size: 0.9rem;
 }
