@@ -142,36 +142,68 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
 
     let homeZero = poisson(lambdaHome, 0) * 100;
     let awayZero = poisson(lambdaAway, 0) * 100;
+
+    const homeShotsExp = (sumHomeRH/5 + sumAwayRR/5) / 2;
+    const awayShotsExp = (sumAwayRH/5 + sumHomeRR/5) / 2;
+    const homeOnTargetExp = (sumHomePH/5 + sumAwayPR/5) / 2;
+    const awayOnTargetExp = (sumAwayPH/5 + sumHomePR/5) / 2;
+    const homeCornersExp = (sumHomeCH/5 + sumAwayCR/5) / 2;
+    const awayCornersExp = (sumAwayCH/5 + sumHomeCR/5) / 2;
+
     document.getElementById('individualStatsContainer').innerHTML = `
         <div class="individual-block">
             <h4>🏠 Local: Goles Esp. ${lambdaHome.toFixed(2)}</h4>
             <p>• Prob. marcar 0: ${homeZero.toFixed(1)}% | Marcar 1+: ${(100 - homeZero).toFixed(1)}%</p>
+            <p style="margin-top: 4px; color: #38bdf8;">• Remates Esp: <strong>${homeShotsExp.toFixed(1)}</strong> | A Puerta: <strong>${homeOnTargetExp.toFixed(1)}</strong> | Corners: <strong>${homeCornersExp.toFixed(1)}</strong></p>
         </div>
-        <div class="individual-block" style="margin-top: 6px;">
+        <div class="individual-block" style="margin-top: 10px; border-top: 1px solid #334155; padding-top: 8px;">
             <h4>✈️ Visitante: Goles Esp. ${lambdaAway.toFixed(2)}</h4>
             <p>• Prob. marcar 0: ${awayZero.toFixed(1)}% | Marcar 1+: ${(100 - awayZero).toFixed(1)}%</p>
+            <p style="margin-top: 4px; color: #38bdf8;">• Remates Esp: <strong>${awayShotsExp.toFixed(1)}</strong> | A Puerta: <strong>${awayOnTargetExp.toFixed(1)}</strong> | Corners: <strong>${awayCornersExp.toFixed(1)}</strong></p>
         </div>
     `;
 
-    document.getElementById('expTotalShots').innerText = (((sumHomeRH/5 + sumAwayRR/5)/2) + ((sumAwayRH/5 + sumHomeRR/5)/2)).toFixed(1);
-    document.getElementById('expTotalOnTarget').innerText = (((sumHomePH/5 + sumAwayPR/5)/2) + ((sumAwayPH/5 + sumHomePR/5)/2)).toFixed(1);
-    document.getElementById('expTotalCorners').innerText = (((sumHomeCH/5 + sumAwayCR/5)/2) + ((sumAwayCH/5 + sumHomeCR/5)/2)).toFixed(1);
+    document.getElementById('expTotalShots').innerText = (homeShotsExp + awayShotsExp).toFixed(1);
+    document.getElementById('expTotalOnTarget').innerText = (homeOnTargetExp + awayOnTargetExp).toFixed(1);
+    document.getElementById('expTotalCorners').innerText = (homeCornersExp + awayCornersExp).toFixed(1);
 
+    // Generador inteligente de Apuestas por Equipo Separado y Alta Probabilidad
     let recsHtml = '';
-    if (homeWin > 0.48) {
-        recsHtml += `<div class="rec-item">🔥 <strong>Victoria Local (1):</strong> Alta probabilidad (${(homeWin*100).toFixed(1)}%).</div>`;
+    
+    // 1. Apuesta Local
+    if (homeShotsExp >= 11.5) {
+        recsHtml += `<div class="rec-item">🎯 <strong>Equipo Local - Remates:</strong> Más de ${(Math.floor(homeShotsExp - 1))}.5 Remates (Esperados: ${homeShotsExp.toFixed(1)})</div>`;
     } else {
-        recsHtml += `<div class="rec-item">⚖️ <strong>Partido Ajustado:</strong> Margen cerrado entre ambos.</div>`;
+        recsHtml += `<div class="rec-item">🎯 <strong>Equipo Local - Goles:</strong> Local Anota (Más de 0.5 goles) - Prob: ${(100 - homeZero).toFixed(1)}%</div>`;
     }
-    if (bttsYes > 0.55) {
-        recsHtml += `<div class="rec-item">⚽ <strong>Ambos Anotan (Sí):</strong> Tendencia ofensiva clara.</div>`;
+
+    // 2. Apuesta Visitante
+    if (awayShotsExp >= 10.5) {
+        recsHtml += `<div class="rec-item">🎯 <strong>Equipo Visitante - Remates:</strong> Más de ${(Math.floor(awayShotsExp - 1))}.5 Remates (Esperados: ${awayShotsExp.toFixed(1)})</div>`;
     } else {
-        recsHtml += `<div class="rec-item">🛡️ <strong>Ambos Anotan (No):</strong> Posible portería a cero.</div>`;
+        recsHtml += `<div class="rec-item">🛡️ <strong>Equipo Visitante - Oportunidad:</strong> Doble Oportunidad Visitante (X2) o Gol Visitante.</div>`;
     }
+
+    // 3. Tiros de Esquina Individuales (Corners)
+    if (homeCornersExp >= 4.2) {
+        recsHtml += `<div class="rec-item">🚩 <strong>Corners Local:</strong> Más de ${(Math.floor(homeCornersExp - 0.5))}.5 Tiros de Esquina del Local (Esp: ${homeCornersExp.toFixed(1)})</div>`;
+    }
+    if (awayCornersExp >= 3.8) {
+        recsHtml += `<div class="rec-item">🚩 <strong>Corners Visitante:</strong> Más de ${(Math.floor(awayCornersExp - 0.5))}.5 Tiros de Esquina del Visitante (Esp: ${awayCornersExp.toFixed(1)})</div>`;
+    }
+
+    // 4. Remates a Puerta Individuales
+    if (homeOnTargetExp >= 3.8) {
+        recsHtml += `<div class="rec-item">⚡ <strong>Remates a Puerta Local:</strong> Más de 3.5 Remates a Puerta del Local (Esp: ${homeOnTargetExp.toFixed(1)})</div>`;
+    } else if (awayOnTargetExp >= 3.2) {
+        recsHtml += `<div class="rec-item">⚡ <strong>Remates a Puerta Visitante:</strong> Más de 2.5 Remates a Puerta del Visitante (Esp: ${awayOnTargetExp.toFixed(1)})</div>`;
+    }
+
+    // 5. Mercado general fuerte
     if (over25 > 0.52) {
-        recsHtml += `<div class="rec-item">📈 <strong>Más de 2.5 Goles:</strong> Alta expectativa de anotación.</div>`;
+        recsHtml += `<div class="rec-item">📈 <strong>Mercado Global:</strong> Más de 2.5 Goles en el partido (${(over25*100).toFixed(1)}%)</div>`;
     } else {
-        recsHtml += `<div class="rec-item">📉 <strong>Menos de 2.5 Goles:</strong> Ritmo controlado.</div>`;
+        recsHtml += `<div class="rec-item">🔒 <strong>Mercado Global:</strong> Menos de 3.5 Goles totales (Control defensivo).</div>`;
     }
 
     document.getElementById('recommendationsList').innerHTML = recsHtml;
