@@ -12,24 +12,50 @@
     <div class="app-container">
         <header>
             <h1>⚽ J-stad PRO</h1>
-            <p>Calculadora de Poisson & Estadísticas Avanzadas</p>
+            <p>Calculadora de Poisson & Promedios (Hace y Recibe)</p>
         </header>
 
         <main>
-            <!-- Sección Equipo Local -->
+            <!-- Sección Local -->
             <section class="team-section">
-                <h2>🏠 Últimos 5 Partidos del Local (Como Local)</h2>
-                <div id="homeMatchesContainer"></div>
+                <h2>🏠 Equipo Local</h2>
+                <div class="match-row">
+                    <div class="inputs-mini">
+                        <div class="input-mini-group"><label>G. Hecho</label><input type="number" id="h_gH" value="1.5" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>G. Recib</label><input type="number" id="h_gR" value="0.9" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Rem. Hecho</label><input type="number" id="h_rH" value="13.5" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Rem. Recib</label><input type="number" id="h_rR" value="10.0" step="0.1" min="0"></div>
+                    </div>
+                    <div class="inputs-mini" style="margin-top: 6px;">
+                        <div class="input-mini-group"><label>Puer. Hecho</label><input type="number" id="h_pH" value="5.0" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Puer. Recib</label><input type="number" id="h_pR" value="3.5" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Corn. Hecho</label><input type="number" id="h_cH" value="5.8" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Corn. Recib</label><input type="number" id="h_cR" value="4.2" step="0.1" min="0"></div>
+                    </div>
+                </div>
             </section>
 
-            <!-- Sección Equipo Visitante -->
+            <!-- Sección Visitante -->
             <section class="team-section" style="margin-top: 20px;">
-                <h2>✈️ Últimos 5 Partidos del Visitante (Como Visitante)</h2>
-                <div id="awayMatchesContainer"></div>
+                <h2>✈️ Equipo Visitante</h2>
+                <div class="match-row">
+                    <div class="inputs-mini">
+                        <div class="input-mini-group"><label>G. Hecho</label><input type="number" id="a_gH" value="1.1" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>G. Recib</label><input type="number" id="a_gR" value="1.3" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Rem. Hecho</label><input type="number" id="a_rH" value="11.0" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Rem. Recib</label><input type="number" id="a_rR" value="12.5" step="0.1" min="0"></div>
+                    </div>
+                    <div class="inputs-mini" style="margin-top: 6px;">
+                        <div class="input-mini-group"><label>Puer. Hecho</label><input type="number" id="a_pH" value="4.0" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Puer. Recib</label><input type="number" id="a_pR" value="4.8" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Corn. Hecho</label><input type="number" id="a_cH" value="4.5" step="0.1" min="0"></div>
+                        <div class="input-mini-group"><label>Corn. Recib</label><input type="number" id="a_cR" value="5.2" step="0.1" min="0"></div>
+                    </div>
+                </div>
             </section>
 
             <!-- Botones de Acción -->
-            <div class="action-buttons">
+            <div class="action-buttons" style="margin-top: 20px;">
                 <button id="calculateBtn" class="btn-primary">Calcular Probabilidades</button>
                 <button id="resetBtn" class="btn-secondary">Reiniciar</button>
             </div>
@@ -38,7 +64,6 @@
             <section id="resultsSection" class="results-section" style="display: none;">
                 <h2>📊 Resultados y Probabilidades</h2>
 
-                <!-- Goles Esperados (Lambda) -->
                 <div class="result-card">
                     <h3>Goles Esperados (Lambda)</h3>
                     <div class="lambdas">
@@ -47,7 +72,6 @@
                     </div>
                 </div>
 
-                <!-- Probabilidades 1X2 y Goles -->
                 <div class="result-card">
                     <h3>Resultado del Partido (1X2)</h3>
                     <div class="prob-grid">
@@ -62,19 +86,16 @@
                     </div>
                 </div>
 
-                <!-- Marcadores Más Probables -->
                 <div class="result-card">
                     <h3>Marcadores Más Probables</h3>
                     <ul id="topScoresList" class="score-list"></ul>
                 </div>
 
-                <!-- NUEVA SECCIÓN: Expectativas y Probabilidades por Equipo Separado -->
                 <div class="result-card">
                     <h3>🎯 Expectativas y Probabilidades por Equipo</h3>
                     <div id="individualStatsContainer" style="margin-top: 8px;"></div>
                 </div>
 
-                <!-- Totales del Partido -->
                 <div class="result-card">
                     <h3>📈 Totales Esperados del Partido</h3>
                     <div class="stats-summary">
@@ -84,7 +105,6 @@
                     </div>
                 </div>
 
-                <!-- Apuestas Recomendadas -->
                 <div class="result-card">
                     <h3>💡 Apuestas de Alta Probabilidad</h3>
                     <div id="recommendationsList" class="recs-container"></div>
