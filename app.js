@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pHOnTarget = poissonOverProbRaw(homeOnTargetExp, homeOnTargetThresh);
             const pAOnTarget = poissonOverProbRaw(awayOnTargetExp, awayOnTargetThresh);
             const pHCorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
-            const pACorners = poissonOverProbRaw(awayCornersExp, awayCornersThresh);
+            const pACorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
 
             const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
             const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
@@ -163,37 +163,41 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${getOddAndBadge(pTotalOnTarget)})</span>`;
             document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${getOddAndBadge(pTotalCorners)})</span>`;
 
-            // Función para generar una lista de varios márgenes escalonados
-            function generateRangesList(lambda, baseThresh) {
-                let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
+            // Función para generar márgenes limpios, con flecha corregida y resaltando en verde si hay buen valor (>= 65%)
+            function generateSensibleRanges(lambda, baseThresh) {
                 let start = Math.max(0, baseThresh - 2);
+                let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
                 for (let t = start; t <= start + 4; t++) {
                     let prob = poissonOverProbRaw(lambda, t);
                     let odd = (1 / prob).toFixed(2);
-                    let highlight = (t === baseThresh) ? 'border-left: 3px solid #38bdf8; padding-left: 4px; font-weight: bold;' : '';
-                    html += `<div style="${highlight}">Más de ${t}.5 $\rightarrow$ <strong>${(prob * 100).toFixed(1)}%</strong> (Cuota: ${odd})</div>`;
+                    
+                    // Si la probabilidad es >= 65%, se pinta en verde brillante de valor
+                    let colorStyle = prob >= 0.65 ? 'color: #10b981; font-weight: bold;' : '';
+                    let badge = prob >= 0.65 ? ' 🔥 Value' : '';
+                    let highlight = (t === baseThresh) ? 'border-left: 3px solid #38bdf8; padding-left: 4px;' : '';
+                    
+                    html += `<div style="${highlight} ${colorStyle}">Más de ${t}.5 -> <strong>${(prob * 100).toFixed(1)}%</strong> (Cuota: ${odd})${badge}</div>`;
                 }
                 html += '</div>';
                 return html;
             }
 
-            // Desglose completo para Goles, Remates Totales, Remates a Puerta y Tiros de Esquina
             document.getElementById('recommendationsList').innerHTML = `
                 <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
-                    ⚽ <strong>Desglose de Márgenes - Goles Totales Partido (${totalGoalsExp.toFixed(2)} esp.):</strong>
-                    ${generateRangesList(totalGoalsExp, totalGoalsThresh)}
+                    ⚽ <strong>Desglose de Márgenes - Goles Totales (${totalGoalsExp.toFixed(2)} esp.):</strong>
+                    ${generateSensibleRanges(totalGoalsExp, totalGoalsThresh)}
                 </div>
                 <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
-                    📈 <strong>Desglose de Márgenes - Remates Totales Partido (${totalShotsExp.toFixed(1)} esp.):</strong>
-                    ${generateRangesList(totalShotsExp, totalShotsThresh)}
+                    📈 <strong>Desglose de Márgenes - Remates Totales (${totalShotsExp.toFixed(1)} esp.):</strong>
+                    ${generateSensibleRanges(totalShotsExp, totalShotsThresh)}
                 </div>
                 <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
                     ⚡ <strong>Desglose de Márgenes - Remates a Puerta Totales (${totalOnTargetExp.toFixed(1)} esp.):</strong>
-                    ${generateRangesList(totalOnTargetExp, totalOnTargetThresh)}
+                    ${generateSensibleRanges(totalOnTargetExp, totalOnTargetThresh)}
                 </div>
                 <div class="rec-item" style="flex-direction: column; align-items: flex-start;">
                     🚩 <strong>Desglose de Márgenes - Tiros de Esquina Totales (${totalCornersExp.toFixed(1)} esp.):</strong>
-                    ${generateRangesList(totalCornersExp, totalCornersThresh)}
+                    ${generateSensibleRanges(totalCornersExp, totalCornersThresh)}
                 </div>
             `;
 
