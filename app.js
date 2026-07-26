@@ -140,7 +140,7 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
         topScoresList.appendChild(li);
     }
 
-    // Cálculos individuales
+    // Estadísticas individuales
     const homeShotsExp = (sumHomeRH/5 + sumAwayRR/5) / 2;
     const awayShotsExp = (sumAwayRH/5 + sumHomeRR/5) / 2;
     const homeOnTargetExp = (sumHomePH/5 + sumAwayPR/5) / 2;
@@ -148,7 +148,12 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
     const homeCornersExp = (sumHomeCH/5 + sumAwayCR/5) / 2;
     const awayCornersExp = (sumAwayCH/5 + sumHomeCR/5) / 2;
 
-    // Función de probabilidad acumulada de Poisson (para superar un umbral)
+    // Totales conjuntos del partido
+    const totalShotsExp = homeShotsExp + awayShotsExp;
+    const totalOnTargetExp = homeOnTargetExp + awayOnTargetExp;
+    const totalCornersExp = homeCornersExp + awayCornersExp;
+
+    // Función de probabilidad acumulada (Poisson para superar umbrales)
     function poissonOverProb(lambda, threshold) {
         let cumulative = 0;
         for (let k = 0; k <= threshold; k++) {
@@ -157,6 +162,7 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
         return Math.max(5, Math.min(95, (1 - cumulative) * 100));
     }
 
+    // Umbrales individuales
     const homeShotsThresh = Math.floor(homeShotsExp - 0.5);
     const awayShotsThresh = Math.floor(awayShotsExp - 0.5);
     const homeOnTargetThresh = Math.floor(homeOnTargetExp - 0.5);
@@ -171,32 +177,43 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
     const pHCorners = poissonOverProb(homeCornersExp, homeCornersThresh);
     const pACorners = poissonOverProb(awayCornersExp, awayCornersThresh);
 
-    // Desglose con porcentajes de remates a puerta incluidos
+    // Umbrales conjuntos (Totales del partido)
+    const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
+    const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
+    const totalCornersThresh = Math.floor(totalCornersExp - 0.5);
+
+    const pTotalShots = poissonOverProb(totalShotsExp, totalShotsThresh);
+    const pTotalOnTarget = poissonOverProb(totalOnTargetExp, totalOnTargetThresh);
+    const pTotalCorners = poissonOverProb(totalCornersExp, totalCornersThresh);
+
+    // Pintar desglose individual por equipo con remates a puerta y sus porcentajes
     document.getElementById('individualStatsContainer').innerHTML = `
         <div style="background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #38bdf8;">
-            <h4 style="color: #38bdf8; margin-bottom: 6px;">🏠 Equipo Local (Desglose Individual)</h4>
-            <div style="margin: 4px 0;">• Remates Totales: <strong>${homeShotsExp.toFixed(1)}</strong> (Más de ${homeShotsThresh}.5: <strong>${pHShots.toFixed(1)}%</strong>)</div>
+            <h4 style="color: #38bdf8; margin-bottom: 6px;">🏠 Equipo Local (Individual)</h4>
+            <div style="margin: 4px 0;">• Remates: <strong>${homeShotsExp.toFixed(1)}</strong> (Más de ${homeShotsThresh}.5: <strong>${pHShots.toFixed(1)}%</strong>)</div>
             <div style="margin: 4px 0;">• Remates a Puerta: <strong>${homeOnTargetExp.toFixed(1)}</strong> (Más de ${homeOnTargetThresh}.5: <strong>${pHOnTarget.toFixed(1)}%</strong>)</div>
             <div style="margin: 4px 0;">• Tiros de Esquina: <strong>${homeCornersExp.toFixed(1)}</strong> (Más de ${homeCornersThresh}.5: <strong>${pHCorners.toFixed(1)}%</strong>)</div>
         </div>
         <div style="background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 8px; border-left: 4px solid #f43f5e;">
-            <h4 style="color: #f43f5e; margin-bottom: 6px;">✈️ Equipo Visitante (Desglose Individual)</h4>
-            <div style="margin: 4px 0;">• Remates Totales: <strong>${awayShotsExp.toFixed(1)}</strong> (Más de ${awayShotsThresh}.5: <strong>${pAShots.toFixed(1)}%</strong>)</div>
+            <h4 style="color: #f43f5e; margin-bottom: 6px;">✈️ Equipo Visitante (Individual)</h4>
+            <div style="margin: 4px 0;">• Remates: <strong>${awayShotsExp.toFixed(1)}</strong> (Más de ${awayShotsThresh}.5: <strong>${pAShots.toFixed(1)}%</strong>)</div>
             <div style="margin: 4px 0;">• Remates a Puerta: <strong>${awayOnTargetExp.toFixed(1)}</strong> (Más de ${awayOnTargetThresh}.5: <strong>${pAOnTarget.toFixed(1)}%</strong>)</div>
             <div style="margin: 4px 0;">• Tiros de Esquina: <strong>${awayCornersExp.toFixed(1)}</strong> (Más de ${awayCornersThresh}.5: <strong>${pACorners.toFixed(1)}%</strong>)</div>
         </div>
     `;
 
-    document.getElementById('expTotalShots').innerText = (homeShotsExp + awayShotsExp).toFixed(1);
-    document.getElementById('expTotalOnTarget').innerText = (homeOnTargetExp + awayOnTargetExp).toFixed(1);
-    document.getElementById('expTotalCorners').innerText = (homeCornersExp + awayCornersExp).toFixed(1);
+    // Pintar totales conjuntos con sus respectivas probabilidades en porcentaje
+    document.getElementById('expTotalShots').innerHTML = `${totalShotsExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalShotsThresh}.5: ${pTotalShots.toFixed(1)}%)</span>`;
+    document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${pTotalOnTarget.toFixed(1)}%)</span>`;
+    document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${pTotalCorners.toFixed(1)}%)</span>`;
 
+    // Apuestas recomendadas actualizadas
     let recsHtml = `
-        <div class="rec-item">🎯 <strong>Local - Remates:</strong> Más de ${homeShotsThresh}.5 Remates (${pHShots.toFixed(1)}%)</div>
-        <div class="rec-item">🎯 <strong>Visitante - Remates:</strong> Más de ${awayShotsThresh}.5 Remates (${pAShots.toFixed(1)}%)</div>
-        <div class="rec-item">⚡ <strong>Local - A Puerta:</strong> Más de ${homeOnTargetThresh}.5 Remates a Puerta (${pHOnTarget.toFixed(1)}%)</div>
-        <div class="rec-item">⚡ <strong>Visitante - A Puerta:</strong> Más de ${awayOnTargetThresh}.5 Remates a Puerta (${pAOnTarget.toFixed(1)}%)</div>
-        <div class="rec-item">🚩 <strong>Esquinas:</strong> Local Más de ${homeCornersThresh}.5 (${pHCorners.toFixed(1)}%) / Visitante Más de ${awayCornersThresh}.5 (${pACorners.toFixed(1)}%)</div>
+        <div class="rec-item">🎯 <strong>Remates Local:</strong> Más de ${homeShotsThresh}.5 (${pHShots.toFixed(1)}%)</div>
+        <div class="rec-item">🎯 <strong>Remates Visitante:</strong> Más de ${awayShotsThresh}.5 (${pAShots.toFixed(1)}%)</div>
+        <div class="rec-item">⚡ <strong>A Puerta Local:</strong> Más de ${homeOnTargetThresh}.5 (${pHOnTarget.toFixed(1)}%)</div>
+        <div class="rec-item">⚡ <strong>A Puerta Visitante:</strong> Más de ${awayOnTargetThresh}.5 (${pAOnTarget.toFixed(1)}%)</div>
+        <div class="rec-item">📈 <strong>Total Partido:</strong> Más de ${totalShotsThresh}.5 Remates Conjuntos (${pTotalShots.toFixed(1)}%)</div>
     `;
 
     document.getElementById('recommendationsList').innerHTML = recsHtml;
