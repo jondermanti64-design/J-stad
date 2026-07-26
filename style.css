@@ -1,213 +1,116 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+/* ==========================================
+   ESTILO CASA DE APUESTAS - PROFESIONAL & PRO
+   ========================================== */
 
+/* Fondo general y tipografía limpia */
 body {
-    background-color: #0f172a;
+    background-color: #0b0f19;
     color: #f8fafc;
-    padding: 12px;
-    display: flex;
-    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.container {
-    width: 100%;
-    max-width: 480px;
+/* Contenedor principal estilo panel de apuestas */
+.container, main, .card {
+    background-color: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto 20px auto;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 14px;
+/* Títulos principales */
+h1, h2, h3, h4 {
+    color: #f9fafb;
+    font-weight: 700;
+    letter-spacing: -0.025em;
 }
 
-header h1 {
-    font-size: 1.3rem;
-    color: #38bdf8;
-}
-
-header p {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-.card {
-    background-color: #1e293b;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.card h2 {
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-    color: #e2e8f0;
-    border-bottom: 1px solid #334155;
-    padding-bottom: 4px;
-}
-
-.match-row {
-    background-color: #0f172a;
+/* Estilo para los inputs y formularios de entrada */
+input[type="number"] {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    color: #ffffff;
+    padding: 8px 12px;
     border-radius: 6px;
-    padding: 6px;
-    margin-bottom: 6px;
-    font-size: 0.75rem;
-}
-
-.match-title {
-    font-weight: bold;
-    color: #38bdf8;
-    margin-bottom: 4px;
-}
-
-.inputs-mini {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-}
-
-.input-mini-group label {
-    display: block;
-    font-size: 0.65rem;
-    color: #94a3b8;
-}
-
-.input-mini-group input {
+    font-size: 0.95rem;
     width: 100%;
-    padding: 4px;
-    font-size: 0.85rem;
-    text-align: center;
-    background-color: #1e293b;
-    border: 1px solid #475569;
-    color: white;
-    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
 }
 
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #0284c7;
-    color: white;
+input[type="number"]:focus {
+    border-color: #38bdf8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* Botones principales de acción */
+button, .btn {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
     cursor: pointer;
-    margin-bottom: 8px;
+    transition: filter 0.2s, transform 0.1s;
+    width: 100%;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-button:hover {
-    background-color: #0369a1;
+button:hover, .btn:hover {
+    filter: brightness(1.1);
 }
 
-.secondary-btn {
-    background-color: #475569;
-    margin-bottom: 14px;
+button:active, .btn:active {
+    transform: scale(0.98);
 }
 
-.lambda-summary {
-    display: flex;
-    justify-content: space-around;
-    background-color: #0f172a;
-    padding: 8px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    font-size: 0.8rem;
-    color: #94a3b8;
+/* Sección de resultados generales */
+#resultsSection {
+    background-color: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
 }
 
-.lambda-summary strong {
-    color: #38bdf8;
-}
-
-.prob-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    margin-bottom: 10px;
-}
-
-.prob-box {
-    background-color: #0f172a;
-    padding: 6px;
-    border-radius: 6px;
-    text-align: center;
-}
-
-.prob-box .label {
-    display: block;
-    font-size: 0.65rem;
-    color: #94a3b8;
-}
-
-.prob-box .value {
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #38bdf8;
-}
-
-.markets-list {
-    background-color: #0f172a;
-    border-radius: 6px;
-    padding: 6px;
-    margin-bottom: 8px;
-}
-
-.market-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 4px 0;
-    font-size: 0.8rem;
-    border-bottom: 1px solid #334155;
-}
-
-.exact-scores h3 {
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-    color: #cbd5e1;
-}
-
-#topScoresList {
-    list-style: none;
-    font-size: 0.75rem;
-}
-
-#topScoresList li {
-    background-color: #0f172a;
-    padding: 4px 8px;
-    border-radius: 4px;
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.individual-section {
-    background-color: #0f172a;
-    border-radius: 6px;
-    padding: 8px;
-    font-size: 0.8rem;
-}
-
-.individual-block h4 {
-    color: #38bdf8;
-    font-size: 0.85rem;
-    margin-bottom: 2px;
-}
-
-.recommendations-box {
-    background-color: #0f172a;
-    border-radius: 6px;
-    padding: 8px;
-}
-
+/* Elementos de recomendación y tablas de márgenes */
 .rec-item {
-    padding: 6px;
+    background: #161e2e !important;
+    border: 1px solid #212f45;
+    border-radius: 8px;
+    padding: 12px !important;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Contenedor de estadísticas individuales (Local / Visitante) */
+#individualStatsContainer > div {
+    background: #161e2e !important;
+    border: 1px solid #212f45 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-radius: 8px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+}
+
+/* Listas de marcadores exactos */
+ul {
+    padding-left: 20px;
+}
+
+li {
     margin-bottom: 6px;
-    background-color: #1e293b;
-    border-left: 3px solid #38bdf8;
-    border-radius: 4px;
-    font-size: 0.8rem;
+}
+
+/* Etiquetas y textos secundarios */
+span {
+    color: #cbd5e1;
 }
