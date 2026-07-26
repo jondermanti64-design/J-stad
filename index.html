@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Deportiva Poisson PRO</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0284c7">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora Poisson PRO</h1>
+            <p>Últimos 5 Partidos (Local en Casa / Visitante Fuera)</p>
+        </header>
+
+        <main>
+            <!-- 🏠 EQUIPO LOCAL -->
+            <div class="card">
+                <h2>🏠 Equipo Local (Últimos 5 en Casa)</h2>
+                <div id="homeMatchesContainer"></div>
+            </div>
+
+            <!-- ✈️ EQUIPO VISITANTE -->
+            <div class="card">
+                <h2>✈️ Equipo Visitante (Últimos 5 Fuera)</h2>
+                <div id="awayMatchesContainer"></div>
+            </div>
+
+            <button id="calculateBtn">Calcular Pronóstico Profesional</button>
+            <button id="resetBtn" class="secondary-btn">Limpiar Datos</button>
+
+            <!-- 📊 RESULTADOS -->
+            <div class="card results-card" id="resultsSection" style="display: none;">
+                <h2>📊 Resultados Globales y Poisson</h2>
+                
+                <div class="lambda-summary">
+                    <span>λ Local: <strong id="lambdaHomeVal">0.00</strong></span>
+                    <span>λ Visitante: <strong id="lambdaAwayVal">0.00</strong></span>
+                </div>
+
+                <div class="prob-grid">
+                    <div class="prob-box">
+                        <span class="label">Local (1)</span>
+                        <span id="homeWinProb" class="value">0%</span>
+                    </div>
+                    <div class="prob-box">
+                        <span class="label">Empate (X)</span>
+                        <span id="drawProb" class="value">0%</span>
+                    </div>
+                    <div class="prob-box">
+                        <span class="label">Visitante (2)</span>
+                        <span id="awayWinProb" class="value">0%</span>
+                    </div>
+                </div>
+
+                <div class="markets-list">
+                    <div class="market-item">
+                        <span>Ambos Anotan (BTTS Sí):</span>
+                        <span id="bttsYes">0%</span>
+                    </div>
+                    <div class="market-item">
+                        <span>Más de 2.5 Goles:</span>
+                        <span id="over25">0%</span>
+                    </div>
+                    <div class="market-item">
+                        <span>Menos de 2.5 Goles:</span>
+                        <span id="under25">0%</span>
+                    </div>
+                </div>
+
+                <div class="exact-scores">
+                    <h3>Top Resultados Exactos</h3>
+                    <ul id="topScoresList"></ul>
+                </div>
+
+                <h2 style="margin-top: 20px;">📈 Proyecciones Individuales</h2>
+                <div class="individual-section" id="individualStatsContainer"></div>
+
+                <h2 style="margin-top: 20px;">🎯 Expectativas de Mercado</h2>
+                <div class="markets-list">
+                    <div class="market-item">
+                        <span>Remates Totales Esperados:</span>
+                        <span id="expTotalShots">0.0</span>
+                    </div>
+                    <div class="market-item">
+                        <span>Remates a Puerta Esperados:</span>
+                        <span id="expTotalOnTarget">0.0</span>
+                    </div>
+                    <div class="market-item">
+                        <span>Tiros de Esquina (Corners) Esperados:</span>
+                        <span id="expTotalCorners">0.0</span>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px; color: #38bdf8;">💡 Mejores Apuestas Recomendadas</h2>
+                <div class="recommendations-box" id="recommendationsList"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
