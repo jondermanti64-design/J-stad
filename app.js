@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pHOnTarget = poissonOverProbRaw(homeOnTargetExp, homeOnTargetThresh);
             const pAOnTarget = poissonOverProbRaw(awayOnTargetExp, awayOnTargetThresh);
             const pHCorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
-            const pACorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
+            const pACorners = poissonOverProbRaw(awayCornersExp, awayCornersThresh);
 
             const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
             const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${getOddAndBadge(pTotalOnTarget)})</span>`;
             document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${getOddAndBadge(pTotalCorners)})</span>`;
 
-            // Función para generar márgenes limpios, con flecha corregida y resaltando en verde si hay buen valor (>= 65%)
+            // Función para generar márgenes limpios con flecha real y resaltado en verde de valor
             function generateSensibleRanges(lambda, baseThresh) {
                 let start = Math.max(0, baseThresh - 2);
                 let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
@@ -171,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     let prob = poissonOverProbRaw(lambda, t);
                     let odd = (1 / prob).toFixed(2);
                     
-                    // Si la probabilidad es >= 65%, se pinta en verde brillante de valor
                     let colorStyle = prob >= 0.65 ? 'color: #10b981; font-weight: bold;' : '';
                     let badge = prob >= 0.65 ? ' 🔥 Value' : '';
                     let highlight = (t === baseThresh) ? 'border-left: 3px solid #38bdf8; padding-left: 4px;' : '';
