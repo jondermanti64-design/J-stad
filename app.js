@@ -140,10 +140,7 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
         topScoresList.appendChild(li);
     }
 
-    let homeZero = poisson(lambdaHome, 0) * 100;
-    let awayZero = poisson(lambdaAway, 0) * 100;
-
-    // Estadísticas individuales exactas cruzadas por equipo
+    // Cálculos individuales
     const homeShotsExp = (sumHomeRH/5 + sumAwayRR/5) / 2;
     const awayShotsExp = (sumAwayRH/5 + sumHomeRR/5) / 2;
     const homeOnTargetExp = (sumHomePH/5 + sumAwayPR/5) / 2;
@@ -151,37 +148,42 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
     const homeCornersExp = (sumHomeCH/5 + sumAwayCR/5) / 2;
     const awayCornersExp = (sumAwayCH/5 + sumHomeCR/5) / 2;
 
-    // Probabilidades individuales de remates y corners usando poisson independiente
-    function poissonProbSum(lambda, threshold) {
+    // Función de probabilidad acumulada de Poisson (para superar un umbral)
+    function poissonOverProb(lambda, threshold) {
         let cumulative = 0;
         for (let k = 0; k <= threshold; k++) {
             cumulative += poisson(lambda, k);
         }
-        return (1 - cumulative) * 100; // Probabilidad de superar el umbral
+        return Math.max(5, Math.min(95, (1 - cumulative) * 100));
     }
 
-    const homeShotsProbOver = poissonProbSum(homeShotsExp, Math.floor(homeShotsExp));
-    const awayShotsProbOver = poissonProbSum(awayShotsExp, Math.floor(awayShotsExp));
-    const homeCornersProbOver = poissonProbSum(homeCornersExp, Math.floor(homeCornersExp));
-    const awayCornersProbOver = poissonProbSum(awayCornersExp, Math.floor(awayCornersExp));
+    const homeShotsThresh = Math.floor(homeShotsExp - 0.5);
+    const awayShotsThresh = Math.floor(awayShotsExp - 0.5);
+    const homeOnTargetThresh = Math.floor(homeOnTargetExp - 0.5);
+    const awayOnTargetThresh = Math.floor(awayOnTargetExp - 0.5);
+    const homeCornersThresh = Math.floor(homeCornersExp - 0.5);
+    const awayCornersThresh = Math.floor(awayCornersExp - 0.5);
 
-    // Desglose visual individual completo
+    const pHShots = poissonOverProb(homeShotsExp, homeShotsThresh);
+    const pAShots = poissonOverProb(awayShotsExp, awayShotsThresh);
+    const pHOnTarget = poissonOverProb(homeOnTargetExp, homeOnTargetThresh);
+    const pAOnTarget = poissonOverProb(awayOnTargetExp, awayOnTargetThresh);
+    const pHCorners = poissonOverProb(homeCornersExp, homeCornersThresh);
+    const pACorners = poissonOverProb(awayCornersExp, awayCornersThresh);
+
+    // Desglose con porcentajes de remates a puerta incluidos
     document.getElementById('individualStatsContainer').innerHTML = `
-        <div class="individual-block" style="background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-            <h4 style="color: #38bdf8; margin-bottom: 6px;">🏠 EQUIPO LOCAL (Desglose Individual)</h4>
-            <p>• Goles Esperados (Lambda): <strong>${lambdaHome.toFixed(2)}</strong></p>
-            <p>• Prob. Marcar 0 Goles: <strong>${homeZero.toFixed(1)}%</strong> | Marcar 1+ Goles: <strong>${(100 - homeZero).toFixed(1)}%</strong></p>
-            <p>• Remates Totales Esperados: <strong>${homeShotsExp.toFixed(1)}</strong> (Prob. Más de ${(Math.floor(homeShotsExp))}.5: <strong>${homeShotsProbOver.toFixed(1)}%</strong>)</p>
-            <p>• Remates a Puerta Esperados: <strong>${homeOnTargetExp.toFixed(1)}</strong></p>
-            <p>• Tiros de Esquina Esperados: <strong>${homeCornersExp.toFixed(1)}</strong> (Prob. Más de ${(Math.floor(homeCornersExp))}.5: <strong>${homeCornersProbOver.toFixed(1)}%</strong>)</p>
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #38bdf8;">
+            <h4 style="color: #38bdf8; margin-bottom: 6px;">🏠 Equipo Local (Desglose Individual)</h4>
+            <div style="margin: 4px 0;">• Remates Totales: <strong>${homeShotsExp.toFixed(1)}</strong> (Más de ${homeShotsThresh}.5: <strong>${pHShots.toFixed(1)}%</strong>)</div>
+            <div style="margin: 4px 0;">• Remates a Puerta: <strong>${homeOnTargetExp.toFixed(1)}</strong> (Más de ${homeOnTargetThresh}.5: <strong>${pHOnTarget.toFixed(1)}%</strong>)</div>
+            <div style="margin: 4px 0;">• Tiros de Esquina: <strong>${homeCornersExp.toFixed(1)}</strong> (Más de ${homeCornersThresh}.5: <strong>${pHCorners.toFixed(1)}%</strong>)</div>
         </div>
-        <div class="individual-block" style="background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px;">
-            <h4 style="color: #38bdf8; margin-bottom: 6px;">✈️ EQUIPO VISITANTE (Desglose Individual)</h4>
-            <p>• Goles Esperados (Lambda): <strong>${lambdaAway.toFixed(2)}</strong></p>
-            <p>• Prob. Marcar 0 Goles: <strong>${awayZero.toFixed(1)}%</strong> | Marcar 1+ Goles: <strong>${(100 - awayZero).toFixed(1)}%</strong></p>
-            <p>• Remates Totales Esperados: <strong>${awayShotsExp.toFixed(1)}</strong> (Prob. Más de ${(Math.floor(awayShotsExp))}.5: <strong>${awayShotsProbOver.toFixed(1)}%</strong>)</p>
-            <p>• Remates a Puerta Esperados: <strong>${awayOnTargetExp.toFixed(1)}</strong></p>
-            <p>• Tiros de Esquina Esperados: <strong>${awayCornersExp.toFixed(1)}</strong> (Prob. Más de ${(Math.floor(awayCornersExp))}.5: <strong>${awayCornersProbOver.toFixed(1)}%</strong>)</p>
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 8px; border-left: 4px solid #f43f5e;">
+            <h4 style="color: #f43f5e; margin-bottom: 6px;">✈️ Equipo Visitante (Desglose Individual)</h4>
+            <div style="margin: 4px 0;">• Remates Totales: <strong>${awayShotsExp.toFixed(1)}</strong> (Más de ${awayShotsThresh}.5: <strong>${pAShots.toFixed(1)}%</strong>)</div>
+            <div style="margin: 4px 0;">• Remates a Puerta: <strong>${awayOnTargetExp.toFixed(1)}</strong> (Más de ${awayOnTargetThresh}.5: <strong>${pAOnTarget.toFixed(1)}%</strong>)</div>
+            <div style="margin: 4px 0;">• Tiros de Esquina: <strong>${awayCornersExp.toFixed(1)}</strong> (Más de ${awayCornersThresh}.5: <strong>${pACorners.toFixed(1)}%</strong>)</div>
         </div>
     `;
 
@@ -189,13 +191,13 @@ document.getElementById('calculateBtn').addEventListener('click', function() {
     document.getElementById('expTotalOnTarget').innerText = (homeOnTargetExp + awayOnTargetExp).toFixed(1);
     document.getElementById('expTotalCorners').innerText = (homeCornersExp + awayCornersExp).toFixed(1);
 
-    // Apuestas de alta probabilidad específicas por equipo y globales
-    let recsHtml = '';
-    recsHtml += `<div class="rec-item">🎯 <strong>Local - Remates:</strong> Más de ${(Math.max(8, Math.floor(homeShotsExp - 1)))}.5 Remates del Local (Esp: ${homeShotsExp.toFixed(1)})</div>`;
-    recsHtml += `<div class="rec-item">🎯 <strong>Visitante - Remates:</strong> Más de ${(Math.max(7, Math.floor(awayShotsExp - 1)))}.5 Remates del Visitante (Esp: ${awayShotsExp.toFixed(1)})</div>`;
-    recsHtml += `<div class="rec-item">🚩 <strong>Local - Corners:</strong> Más de ${(Math.max(3, Math.floor(homeCornersExp - 0.5)))}.5 Tiros de Esquina Local (Esp: ${homeCornersExp.toFixed(1)})</div>`;
-    recsHtml += `<div class="rec-item">🚩 <strong>Visitante - Corners:</strong> Más de ${(Math.max(2, Math.floor(awayCornersExp - 0.5)))}.5 Tiros de Esquina Visitante (Esp: ${awayCornersExp.toFixed(1)})</div>`;
-    recsHtml += `<div class="rec-item">⚡ <strong>Remates a Puerta:</strong> Local Más de 2.5 (${homeOnTargetExp.toFixed(1)}) / Visitante Más de 1.5 (${awayOnTargetExp.toFixed(1)})</div>`;
+    let recsHtml = `
+        <div class="rec-item">🎯 <strong>Local - Remates:</strong> Más de ${homeShotsThresh}.5 Remates (${pHShots.toFixed(1)}%)</div>
+        <div class="rec-item">🎯 <strong>Visitante - Remates:</strong> Más de ${awayShotsThresh}.5 Remates (${pAShots.toFixed(1)}%)</div>
+        <div class="rec-item">⚡ <strong>Local - A Puerta:</strong> Más de ${homeOnTargetThresh}.5 Remates a Puerta (${pHOnTarget.toFixed(1)}%)</div>
+        <div class="rec-item">⚡ <strong>Visitante - A Puerta:</strong> Más de ${awayOnTargetThresh}.5 Remates a Puerta (${pAOnTarget.toFixed(1)}%)</div>
+        <div class="rec-item">🚩 <strong>Esquinas:</strong> Local Más de ${homeCornersThresh}.5 (${pHCorners.toFixed(1)}%) / Visitante Más de ${awayCornersThresh}.5 (${pACorners.toFixed(1)}%)</div>
+    `;
 
     document.getElementById('recommendationsList').innerHTML = recsHtml;
     document.getElementById('resultsSection').style.display = 'block';
