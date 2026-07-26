@@ -1,8 +1,7 @@
 /* ==========================================
-   ESTILO CASA DE APUESTAS - PROFESIONAL & PRO
+   ESTILO ORIGINAL PREFERIDO
    ========================================== */
 
-/* Fondo general y tipografía limpia */
 body {
     background-color: #0b0f19;
     color: #f8fafc;
@@ -12,7 +11,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Contenedor principal estilo panel de apuestas */
 .container, main, .card {
     background-color: #111827;
     border: 1px solid #1f2937;
@@ -23,14 +21,12 @@ body {
     margin: 0 auto 20px auto;
 }
 
-/* Títulos principales */
 h1, h2, h3, h4 {
     color: #f9fafb;
     font-weight: 700;
     letter-spacing: -0.025em;
 }
 
-/* Estilo para los inputs y formularios de entrada */
 input[type="number"] {
     background-color: #1f2937;
     border: 1px solid #374151;
@@ -40,16 +36,8 @@ input[type="number"] {
     font-size: 0.95rem;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.2s;
 }
 
-input[type="number"]:focus {
-    border-color: #38bdf8;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
-}
-
-/* Botones principales de acción */
 button, .btn {
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     color: #ffffff;
@@ -58,59 +46,15 @@ button, .btn {
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
-    transition: filter 0.2s, transform 0.1s;
     width: 100%;
     font-size: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-button:hover, .btn:hover {
-    filter: brightness(1.1);
-}
-
-button:active, .btn:active {
-    transform: scale(0.98);
-}
-
-/* Sección de resultados generales */
 #resultsSection {
     background-color: #111827;
     border: 1px solid #1f2937;
     border-radius: 12px;
     padding: 15px;
     margin-top: 20px;
-}
-
-/* Elementos de recomendación y tablas de márgenes */
-.rec-item {
-    background: #161e2e !important;
-    border: 1px solid #212f45;
-    border-radius: 8px;
-    padding: 12px !important;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Contenedor de estadísticas individuales (Local / Visitante) */
-#individualStatsContainer > div {
-    background: #161e2e !important;
-    border: 1px solid #212f45 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    border-radius: 8px !important;
-    padding: 12px !important;
-    margin-bottom: 12px !important;
-}
-
-/* Listas de marcadores exactos */
-ul {
-    padding-left: 20px;
-}
-
-li {
-    margin-bottom: 6px;
-}
-
-/* Etiquetas y textos secundarios */
-span {
-    color: #cbd5e1;
 }
