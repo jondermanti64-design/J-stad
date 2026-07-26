@@ -120,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 topScoresList.appendChild(li);
             }
 
-            // Umbrales base ideales por defecto (para resaltar la línea más cercana a la media)
             const homeShotsThresh = Math.floor(homeShotsExp - 0.5);
             const awayShotsThresh = Math.floor(awayShotsExp - 0.5);
             const homeOnTargetThresh = Math.floor(homeOnTargetExp - 0.5);
@@ -164,10 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${getOddAndBadge(pTotalOnTarget)})</span>`;
             document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${getOddAndBadge(pTotalCorners)})</span>`;
 
-            // Función para generar tablas con líneas fijas/coherentes (empezando desde un start fijo o dinámico sensato)
+            // Función para generar tablas con líneas estrictamente fijas y coherentes hacia arriba (5 líneas en total)
             function generateFixedRangeTable(lambda, startThresh, defaultThresh) {
                 let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
-                for (let t = startThresh; t <= startThresh + 4; t++) {
+                for (let t = startThresh; t < startThresh + 5; t++) {
                     let prob = poissonOverProbRaw(lambda, t);
                     let odd = (1 / prob).toFixed(2);
                     
@@ -181,27 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 return html;
             }
 
-            // Definir líneas iniciales fijas y coherentes para cada mercado
-            // Goles Totales (Empieza en 0.5)
-            const goalsStart = 0; 
-            // Remates Totales Partido (Empieza fijo coherente, ej: 19.5 o dinámico si es menor)
-            const shotsTotalStart = Math.max(0, Math.min(19, totalShotsExp - 3));
-            // Remates a Puerta Totales Partido (Empieza fijo coherente, ej: 6.5)
-            const onTargetTotalStart = Math.max(0, Math.min(6, totalOnTargetExp - 2));
-            // Tiros de Esquina Totales Partido (Empieza fijo coherente, ej: 7.5 o 8.5)
-            const cornersTotalStart = Math.max(0, Math.min(7, totalCornersExp - 3));
+            // Bases fijas y coherentes estándar para los mercados principales del partido
+            const goalsStart = 0; // Empieza en Más de 0.5
+            const shotsTotalStart = 19; // Empieza fijo en Más de 19.5
+            const onTargetTotalStart = 6; // Empieza fijo en Más de 6.5
+            const cornersTotalStart = 7; // Empieza fijo en Más de 7.5
 
-            // Individuales Local
-            const homeGoalsStart = 0;
-            const homeShotsStart = Math.max(0, Math.min(9, homeShotsExp - 2));
-            const homeOnTargetStart = Math.max(0, Math.min(2, homeOnTargetExp - 1));
-            const homeCornersStart = Math.max(0, Math.min(3, homeCornersExp - 1));
-
-            // Individuales Visitante
-            const awayGoalsStart = 0;
-            const awayShotsStart = Math.max(0, Math.min(9, awayShotsExp - 2));
-            const awayOnTargetStart = Math.max(0, Math.min(2, awayOnTargetExp - 1));
-            const awayCornersStart = Math.max(0, Math.min(3, awayCornersExp - 1));
+            // Bases fijas y coherentes para Individuales (Local y Visitante)
+            const homeGoalsStart = 0, awayGoalsStart = 0;
+            const homeShotsStart = 9, awayShotsStart = 9;
+            const homeOnTargetStart = 2, awayOnTargetStart = 2;
+            const homeCornersStart = 2, awayCornersStart = 2;
 
             document.getElementById('recommendationsList').innerHTML = `
                 <!-- GOLES -->
