@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (calcBtn) {
         calcBtn.addEventListener('click', () => {
-            // Capturar Hechos y Recibidos del Local
             const hGF = parseFloat(document.getElementById('h_gH').value) || 0;
             const hGA = parseFloat(document.getElementById('h_gR').value) || 0;
             const hRH = parseFloat(document.getElementById('h_rH').value) || 0;
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const hCH = parseFloat(document.getElementById('h_cH').value) || 0;
             const hCR = parseFloat(document.getElementById('h_cR').value) || 0;
 
-            // Capturar Hechos y Recibidos del Visitante
             const aGF = parseFloat(document.getElementById('a_gH').value) || 0;
             const aGA = parseFloat(document.getElementById('a_gR').value) || 0;
             const aRH = parseFloat(document.getElementById('a_rH').value) || 0;
@@ -32,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const aCH = parseFloat(document.getElementById('a_cH').value) || 0;
             const aCR = parseFloat(document.getElementById('a_cR').value) || 0;
 
-            // Goles / Lambdas / Expectativas Individuales y Totales
             const lambdaHome = (hGF + aGA) / 2;
             const lambdaAway = (aGF + hGA) / 2;
             const totalGoalsExp = lambdaHome + lambdaAway;
@@ -126,6 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const awayOnTargetThresh = Math.floor(awayOnTargetExp - 0.5);
             const homeCornersThresh = Math.floor(homeCornersExp - 0.5);
             const awayCornersThresh = Math.floor(awayCornersExp - 0.5);
+            const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
+            const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
+            const totalCornersThresh = Math.floor(totalCornersExp - 0.5);
+            const totalGoalsThresh = Math.floor(totalGoalsExp - 0.5);
 
             const pHShots = poissonOverProbRaw(homeShotsExp, homeShotsThresh);
             const pAShots = poissonOverProbRaw(awayShotsExp, awayShotsThresh);
@@ -133,11 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const pAOnTarget = poissonOverProbRaw(awayOnTargetExp, awayOnTargetThresh);
             const pHCorners = poissonOverProbRaw(homeCornersExp, homeCornersThresh);
             const pACorners = poissonOverProbRaw(awayCornersExp, awayCornersThresh);
-
-            const totalShotsThresh = Math.floor(totalShotsExp - 0.5);
-            const totalOnTargetThresh = Math.floor(totalOnTargetExp - 0.5);
-            const totalCornersThresh = Math.floor(totalCornersExp - 0.5);
-            const totalGoalsThresh = Math.floor(totalGoalsExp - 0.5);
 
             const pTotalShots = poissonOverProbRaw(totalShotsExp, totalShotsThresh);
             const pTotalOnTarget = poissonOverProbRaw(totalOnTargetExp, totalOnTargetThresh);
@@ -163,16 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('expTotalOnTarget').innerHTML = `${totalOnTargetExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalOnTargetThresh}.5: ${getOddAndBadge(pTotalOnTarget)})</span>`;
             document.getElementById('expTotalCorners').innerHTML = `${totalCornersExp.toFixed(1)} <span style="font-size:0.85rem; color:#38bdf8;">(Más de ${totalCornersThresh}.5: ${getOddAndBadge(pTotalCorners)})</span>`;
 
-            // Función para generar tablas con líneas estrictamente fijas y coherentes hacia arriba (5 líneas en total)
-            function generateFixedRangeTable(lambda, startThresh, defaultThresh) {
+            function generateDynamicRangeTable(lambda, defaultThres) {
+                let start = Math.max(0, defaultThres - 2);
                 let html = '<div style="font-size: 0.85rem; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">';
-                for (let t = startThresh; t < startThresh + 5; t++) {
+                for (let t = start; t < start + 5; t++) {
                     let prob = poissonOverProbRaw(lambda, t);
                     let odd = (1 / prob).toFixed(2);
-                    
                     let colorStyle = prob >= 0.65 ? 'color: #10b981; font-weight: bold;' : '';
                     let badge = prob >= 0.65 ? ' 🔥 Value' : '';
-                    let highlight = (t === defaultThresh) ? 'border-left: 3px solid #38bdf8; padding-left: 4px;' : '';
+                    let highlight = (t === defaultThres) ? 'border-left: 3px solid #38bdf8; padding-left: 4px;' : '';
                     
                     html += `<div style="${highlight} ${colorStyle}">Más de ${t}.5 -> <strong>${(prob * 100).toFixed(1)}%</strong> (Cuota: ${odd})${badge}</div>`;
                 }
@@ -180,73 +175,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 return html;
             }
 
-            // Bases fijas y coherentes estándar para los mercados principales del partido
-            const goalsStart = 0; // Empieza en Más de 0.5
-            const shotsTotalStart = 19; // Empieza fijo en Más de 19.5
-            const onTargetTotalStart = 6; // Empieza fijo en Más de 6.5
-            const cornersTotalStart = 7; // Empieza fijo en Más de 7.5
-
-            // Bases fijas y coherentes para Individuales (Local y Visitante)
-            const homeGoalsStart = 0, awayGoalsStart = 0;
-            const homeShotsStart = 9, awayShotsStart = 9;
-            const homeOnTargetStart = 2, awayOnTargetStart = 2;
-            const homeCornersStart = 2, awayCornersStart = 2;
-
             document.getElementById('recommendationsList').innerHTML = `
-                <!-- GOLES -->
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                <!-- 1. GOLES -->
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; border-left: 4px solid #38bdf8;">
                     ⚽ <strong>Desglose de Márgenes - Goles Totales (${totalGoalsExp.toFixed(2)} esp.):</strong>
-                    ${generateFixedRangeTable(totalGoalsExp, goalsStart, totalGoalsThresh)}
+                    ${generateDynamicRangeTable(totalGoalsExp, totalGoalsThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    ⚽ <strong>Goles - Local (${lambdaHome.toFixed(2)} esp.):</strong>
-                    ${generateFixedRangeTable(lambdaHome, homeGoalsStart, Math.floor(lambdaHome - 0.5))}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    🏠 <strong>Goles - Local (${lambdaHome.toFixed(2)} esp.):</strong>
+                    ${generateDynamicRangeTable(lambdaHome, Math.floor(lambdaHome - 0.5))}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 15px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    ⚽ <strong>Goles - Visitante (${lambdaAway.toFixed(2)} esp.):</strong>
-                    ${generateFixedRangeTable(lambdaAway, awayGoalsStart, Math.floor(lambdaAway - 0.5))}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 20px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    ✈️ <strong>Goles - Visitante (${lambdaAway.toFixed(2)} esp.):</strong>
+                    ${generateDynamicRangeTable(lambdaAway, Math.floor(lambdaAway - 0.5))}
                 </div>
 
-                <!-- REMATES TOTALES -->
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                <!-- 2. REMATES TOTALES -->
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; border-left: 4px solid #38bdf8;">
                     📈 <strong>Desglose de Márgenes - Remates Totales Partido (${totalShotsExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(totalShotsExp, shotsTotalStart, totalShotsThresh)}
+                    ${generateDynamicRangeTable(totalShotsExp, totalShotsThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    📈 <strong>Remates - Local (${homeShotsExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(homeShotsExp, homeShotsStart, homeShotsThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    🏠 <strong>Remates - Local (${homeShotsExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(homeShotsExp, homeShotsThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 15px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    📈 <strong>Remates - Visitante (${awayShotsExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(awayShotsExp, awayShotsStart, awayShotsThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 20px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    ✈️ <strong>Remates - Visitante (${awayShotsExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(awayShotsExp, awayShotsThresh)}
                 </div>
 
-                <!-- REMATES A PUERTA -->
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                <!-- 3. REMATES A PUERTA -->
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; border-left: 4px solid #38bdf8;">
                     ⚡ <strong>Desglose de Márgenes - Remates a Puerta Totales (${totalOnTargetExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(totalOnTargetExp, onTargetTotalStart, totalOnTargetThresh)}
+                    ${generateDynamicRangeTable(totalOnTargetExp, totalOnTargetThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    ⚡ <strong>Remates a Puerta - Local (${homeOnTargetExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(homeOnTargetExp, homeOnTargetStart, homeOnTargetThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    🏠 <strong>Remates a Puerta - Local (${homeOnTargetExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(homeOnTargetExp, homeOnTargetThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 15px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    ⚡ <strong>Remates a Puerta - Visitante (${awayOnTargetExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(awayOnTargetExp, awayOnTargetStart, awayOnTargetThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 20px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    ✈️ <strong>Remates a Puerta - Visitante (${awayOnTargetExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(awayOnTargetExp, awayOnTargetThresh)}
                 </div>
 
-                <!-- TIROS DE ESQUINA -->
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                <!-- 4. TIROS DE ESQUINA -->
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; border-left: 4px solid #38bdf8;">
                     🚩 <strong>Desglose de Márgenes - Tiros de Esquina Totales (${totalCornersExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(totalCornersExp, cornersTotalStart, totalCornersThresh)}
+                    ${generateDynamicRangeTable(totalCornersExp, totalCornersThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 10px; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    🚩 <strong>Tiros de Esquina - Local (${homeCornersExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(homeCornersExp, homeCornersStart, homeCornersThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    🏠 <strong>Tiros de Esquina - Local (${homeCornersExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(homeCornersExp, homeCornersThresh)}
                 </div>
-                <div class="rec-item" style="flex-direction: column; align-items: flex-start; background: rgba(15, 23, 42, 0.3); padding: 8px; border-radius: 6px;">
-                    🚩 <strong>Tiros de Esquina - Visitante (${awayCornersExp.toFixed(1)} esp.):</strong>
-                    ${generateFixedRangeTable(awayCornersExp, awayCornersStart, awayCornersThresh)}
+                <div class="rec-item" style="flex-direction: column; align-items: flex-start; background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 8px;">
+                    ✈️ <strong>Tiros de Esquina - Visitante (${awayCornersExp.toFixed(1)} esp.):</strong>
+                    ${generateDynamicRangeTable(awayCornersExp, awayCornersThresh)}
                 </div>
             `;
 
