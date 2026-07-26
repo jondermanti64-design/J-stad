@@ -6,97 +6,90 @@
     <title>Calculadora Deportiva Poisson PRO</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0284c7">
+    <meta name="theme-color" content="#0f172a">
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <header>
-            <h1>Calculadora Poisson PRO</h1>
-            <p>Últimos 5 Partidos (Local en Casa / Visitante Fuera)</p>
+            <h1>⚽ J-stad PRO</h1>
+            <p>Calculadora de Poisson & Estadísticas Avanzadas</p>
         </header>
 
         <main>
-            <!-- 🏠 EQUIPO LOCAL -->
-            <div class="card">
-                <h2>🏠 Equipo Local (Últimos 5 en Casa)</h2>
+            <!-- Sección Equipo Local -->
+            <section class="team-section">
+                <h2>🏠 Últimos 5 Partidos del Local (Como Local)</h2>
                 <div id="homeMatchesContainer"></div>
-            </div>
+            </section>
 
-            <!-- ✈️ EQUIPO VISITANTE -->
-            <div class="card">
-                <h2>✈️ Equipo Visitante (Últimos 5 Fuera)</h2>
+            <!-- Sección Equipo Visitante -->
+            <section class="team-section" style="margin-top: 20px;">
+                <h2>✈️ Últimos 5 Partidos del Visitante (Como Visitante)</h2>
                 <div id="awayMatchesContainer"></div>
+            </section>
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <button id="calculateBtn" class="btn-primary">Calcular Probabilidades</button>
+                <button id="resetBtn" class="btn-secondary">Reiniciar</button>
             </div>
 
-            <button id="calculateBtn">Calcular Pronóstico Profesional</button>
-            <button id="resetBtn" class="secondary-btn">Limpiar Datos</button>
+            <!-- Sección de Resultados -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <h2>📊 Resultados y Probabilidades</h2>
 
-            <!-- 📊 RESULTADOS -->
-            <div class="card results-card" id="resultsSection" style="display: none;">
-                <h2>📊 Resultados Globales y Poisson</h2>
-                
-                <div class="lambda-summary">
-                    <span>λ Local: <strong id="lambdaHomeVal">0.00</strong></span>
-                    <span>λ Visitante: <strong id="lambdaAwayVal">0.00</strong></span>
-                </div>
-
-                <div class="prob-grid">
-                    <div class="prob-box">
-                        <span class="label">Local (1)</span>
-                        <span id="homeWinProb" class="value">0%</span>
-                    </div>
-                    <div class="prob-box">
-                        <span class="label">Empate (X)</span>
-                        <span id="drawProb" class="value">0%</span>
-                    </div>
-                    <div class="prob-box">
-                        <span class="label">Visitante (2)</span>
-                        <span id="awayWinProb" class="value">0%</span>
+                <!-- Goles Esperados (Lambda) -->
+                <div class="result-card">
+                    <h3>Goles Esperados (Lambda)</h3>
+                    <div class="lambdas">
+                        <div>Local: <span id="lambdaHomeVal">0.00</span></div>
+                        <div>Visitante: <span id="lambdaAwayVal">0.00</span></div>
                     </div>
                 </div>
 
-                <div class="markets-list">
-                    <div class="market-item">
-                        <span>Ambos Anotan (BTTS Sí):</span>
-                        <span id="bttsYes">0%</span>
+                <!-- Probabilidades 1X2 y Goles -->
+                <div class="result-card">
+                    <h3>Resultado del Partido (1X2)</h3>
+                    <div class="prob-grid">
+                        <div class="prob-box"><span>Local (1)</span><strong id="homeWinProb">0%</strong></div>
+                        <div class="prob-box"><span>Empate (X)</span><strong id="drawProb">0%</strong></div>
+                        <div class="prob-box"><span>Visitante (2)</span><strong id="awayWinProb">0%</strong></div>
                     </div>
-                    <div class="market-item">
-                        <span>Más de 2.5 Goles:</span>
-                        <span id="over25">0%</span>
-                    </div>
-                    <div class="market-item">
-                        <span>Menos de 2.5 Goles:</span>
-                        <span id="under25">0%</span>
-                    </div>
-                </div>
-
-                <div class="exact-scores">
-                    <h3>Top Resultados Exactos</h3>
-                    <ul id="topScoresList"></ul>
-                </div>
-
-                <h2 style="margin-top: 20px;">📈 Proyecciones Individuales</h2>
-                <div class="individual-section" id="individualStatsContainer"></div>
-
-                <h2 style="margin-top: 20px;">🎯 Expectativas de Mercado</h2>
-                <div class="markets-list">
-                    <div class="market-item">
-                        <span>Remates Totales Esperados:</span>
-                        <span id="expTotalShots">0.0</span>
-                    </div>
-                    <div class="market-item">
-                        <span>Remates a Puerta Esperados:</span>
-                        <span id="expTotalOnTarget">0.0</span>
-                    </div>
-                    <div class="market-item">
-                        <span>Tiros de Esquina (Corners) Esperados:</span>
-                        <span id="expTotalCorners">0.0</span>
+                    <div class="prob-grid" style="margin-top: 10px;">
+                        <div class="prob-box"><span>Ambos Anotan (Sí)</span><strong id="bttsYes">0%</strong></div>
+                        <div class="prob-box"><span>Más de 2.5 Goles</span><strong id="over25">0%</strong></div>
+                        <div class="prob-box"><span>Menos de 2.5 Goles</span><strong id="under25">0%</strong></div>
                     </div>
                 </div>
 
-                <h2 style="margin-top: 20px; color: #38bdf8;">💡 Mejores Apuestas Recomendadas</h2>
-                <div class="recommendations-box" id="recommendationsList"></div>
-            </div>
+                <!-- Marcadores Más Probables -->
+                <div class="result-card">
+                    <h3>Marcadores Más Probables</h3>
+                    <ul id="topScoresList" class="score-list"></ul>
+                </div>
+
+                <!-- NUEVA SECCIÓN: Expectativas y Probabilidades por Equipo Separado -->
+                <div class="result-card">
+                    <h3>🎯 Expectativas y Probabilidades por Equipo</h3>
+                    <div id="individualStatsContainer" style="margin-top: 8px;"></div>
+                </div>
+
+                <!-- Totales del Partido -->
+                <div class="result-card">
+                    <h3>📈 Totales Esperados del Partido</h3>
+                    <div class="stats-summary">
+                        <p>Remates Totales: <strong id="expTotalShots">0.0</strong></p>
+                        <p>Remates a Puerta: <strong id="expTotalOnTarget">0.0</strong></p>
+                        <p>Tiros de Esquina (Corners): <strong id="expTotalCorners">0.0</strong></p>
+                    </div>
+                </div>
+
+                <!-- Apuestas Recomendadas -->
+                <div class="result-card">
+                    <h3>💡 Apuestas de Alta Probabilidad</h3>
+                    <div id="recommendationsList" class="recs-container"></div>
+                </div>
+            </section>
         </main>
     </div>
 
